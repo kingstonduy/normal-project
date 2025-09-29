@@ -15,6 +15,13 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   node-version: 18
-            - run: npm install
+            - name: Cache node modules
+              uses: actions/cache@v3
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}-${{ steps.setup-node.outputs.node-version }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
+            - run: npm ci
             - run: npm run build
             - run: npm run test
