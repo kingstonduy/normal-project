@@ -5,11 +5,10 @@ import "./index.css";
 import App from "./App.jsx";
 
 const queryClient = new QueryClient();
+<QueryClientProvider client={queryClient}></QueryClientProvider>;
 
 createRoot(document.getElementById("root")).render(
     <StrictMode>
-        <QueryClientProvider client={queryClient}>
-            <App />
-        </QueryClientProvider>
+        <App />
     </StrictMode>
 );

@@ -1,137 +1,60 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-
-const fetchRepos = async ({ queryKey }) => {
-    const [_key, { q, sort, perPage, page }] = queryKey;
-    const params = {
-        q: q || "react",
-        sort: sort === "best-match" ? undefined : sort,
-        order: "desc",
-        per_page: perPage,
-        page,
-    };
-    const res = await axios.get("https://api.github.com/search/repositories", {
-        params,
-    });
-    return res.data;
-};
+// src/App.jsx
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Home from "./pages/Home";
+import { exercises } from "./data/exercises";
+import PageLayout from "./components/PageLayout";
+import { lazy, Suspense } from "react";
 
 export default function App() {
-    const [search, setSearch] = useState("nextjs");
-    const [sort, setSort] = useState("best-match");
-    const [perPage, setPerPage] = useState(10);
-    const [page, setPage] = useState(1);
-
-    const { data, isLoading, isError } = useQuery({
-        queryKey: ["repos", { q: search, sort, perPage, page }],
-        queryFn: fetchRepos,
-        keepPreviousData: true,
-    });
-
-    const totalCount = data?.total_count || 0;
-    const totalPages = Math.ceil(totalCount / perPage);
+    // dynamically import Exc1 – Exc20
+    const components = Array.from({ length: 20 }, (_, i) =>
+        lazy(() => import(`./pages/Exc${i + 1}.jsx`))
+    );
+    /*
+    1. Array.from({ length: 20 }, ...)
+        This creates a new array with 20 elements.
+        The elements don’t have values yet — just 20 empty slots.
+        The second argument (the arrow function) tells Array.from how to fill each slot.
+    2. (_, i) => ...
+        The first parameter _ is the current element (we don’t use it, so _ is a convention).
+        i is the index (from 0 to 19).
+    3. lazy(() => import(...))
+        lazy() is a React function that enables lazy loading (code splitting).
+        It takes a function that dynamically imports a component file only when it’s needed.
+    4. The template literal `./pages/Exc${i + 1}.jsx`
+        Uses string interpolation to dynamically form the filename:
+        When i = 0 → ./pages/Exc1.jsx
+        When i = 1 → ./pages/Exc2.jsx
+        … and so on up to Exc20.jsx.    
+     */
 
     return (
-        <div className="min-h-screen bg-gray-100 p-6">
-            <h1 className="text-3xl font-bold mb-6 text-center">
-                GitHub Repo Search
-            </h1>
+        <Router>
+            <Routes>
+                <Route path="/" element={<Home />} />
 
-            <div className="flex flex-wrap justify-center gap-3 mb-6">
-                <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search repositories..."
-                    className="border rounded-lg px-3 py-2 w-64"
-                />
+                {exercises.map((exercise, i) => {
+                    const Component = components[i]; // pick correct ExcN
 
-                <select
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value)}
-                    className="border rounded-lg px-3 py-2"
-                >
-                    <option value="best-match">Best Match</option>
-                    <option value="stars">Stars</option>
-                    <option value="updated">Most Updated</option>
-                </select>
-
-                <select
-                    value={perPage}
-                    onChange={(e) => setPerPage(Number(e.target.value))}
-                    className="border rounded-lg px-3 py-2"
-                >
-                    {[10, 20, 30, 50].map((n) => (
-                        <option key={n} value={n}>
-                            {n} per page
-                        </option>
-                    ))}
-                </select>
-            </div>
-
-            {isLoading && <p className="text-center">Loading...</p>}
-            {isError && (
-                <p className="text-center text-red-600">Error loading data</p>
-            )}
-
-            {!isLoading && data && (
-                <>
-                    <div className="space-y-3">
-                        {data.items.map((repo) => (
-                            <div
-                                key={repo.id}
-                                className="bg-white shadow-md p-4 rounded-xl hover:bg-gray-50"
-                            >
-                                <a
-                                    href={repo.html_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-600 font-semibold text-lg"
-                                >
-                                    {repo.full_name}
-                                </a>
-                                <p className="text-gray-700">
-                                    {repo.description}
-                                </p>
-                                <div className="text-sm text-gray-600 mt-1 flex gap-4">
-                                    ⭐ {repo.stargazers_count} stars
-                                    <span>
-                                        🕒 Updated:{" "}
-                                        {new Date(
-                                            repo.updated_at
-                                        ).toLocaleDateString()}
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="flex justify-center items-center gap-3 mt-6">
-                        <button
-                            onClick={() => setPage((p) => Math.max(1, p - 1))}
-                            disabled={page === 1}
-                            className="px-3 py-2 bg-gray-300 rounded-lg disabled:opacity-50"
-                        >
-                            Prev
-                        </button>
-
-                        <span>
-                            Page {page} / {totalPages}
-                        </span>
-
-                        <button
-                            onClick={() =>
-                                setPage((p) => (p < totalPages ? p + 1 : p))
+                    return (
+                        <Route
+                            key={i}
+                            path={`/exc${i + 1}`}
+                            element={
+                                <Suspense fallback={<div>Loading...</div>}>
+                                    <PageLayout
+                                        description={exercise.description}
+                                        url={exercise.url}
+                                        title={exercise.title}
+                                    >
+                                        <Component />
+                                    </PageLayout>
+                                </Suspense>
                             }
-                            disabled={page >= totalPages}
-                            className="px-3 py-2 bg-gray-300 rounded-lg disabled:opacity-50"
-                        >
-                            Next
-                        </button>
-                    </div>
-                </>
-            )}
-        </div>
+                        />
+                    );
+                })}
+            </Routes>
+        </Router>
     );
 }
