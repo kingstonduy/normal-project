@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import { exercises } from "./data/exercises";
 import PageLayout from "./components/PageLayout";
 import { lazy, Suspense } from "react";
+import { BASE_URL } from "./data/Constant";
 
 export default function App() {
     const modules = import.meta.glob("./pages/Exc*.jsx");
@@ -29,10 +30,8 @@ export default function App() {
         … and so on up to Exc20.jsx.    
      */
 
-    const basename = import.meta.env.VITE_BASENAME || "/";
-
     return (
-        <Router basename={basename}>
+        <Router basename={BASE_URL}>
             <Routes>
                 <Route path="/" element={<Home />} />
 
