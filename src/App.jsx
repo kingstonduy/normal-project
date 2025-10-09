@@ -6,10 +6,11 @@ import PageLayout from "./components/PageLayout";
 import { lazy, Suspense } from "react";
 
 export default function App() {
+    const modules = import.meta.glob("./pages/Exc*.jsx");
     // dynamically import Exc1 – Exc20
-    const components = Array.from({ length: 20 }, (_, i) =>
-        lazy(() => import(`./pages/Exc${i + 1}.jsx`))
-    );
+    const components = Object.keys(modules)
+        .sort() // optional if you want Exc1, Exc2, Exc3... order
+        .map((path) => lazy(modules[path]));
     /*
     1. Array.from({ length: 20 }, ...)
         This creates a new array with 20 elements.

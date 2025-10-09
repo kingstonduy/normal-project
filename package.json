@@ -1,6 +1,5 @@
 {
     "name": "my-project",
-    "homepage": "https://github.com/kingstonduy/normal-project",
     "private": true,
     "version": "0.0.0",
     "type": "module",
