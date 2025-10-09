@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function PageLayout({ title, description, url, children }) {
     return (
-        <div className="min-h-screen w-full bg-gray-50 py-12 px-8">
+        <div className="min-h-screen w-full bg-gray-50 py-12 px-25">
             {/* Home Button */}
             <Nav />
             <Header title={title} description={description} url={url} />
