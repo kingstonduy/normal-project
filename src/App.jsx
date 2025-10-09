@@ -29,8 +29,10 @@ export default function App() {
         … and so on up to Exc20.jsx.    
      */
 
+    const basename = import.meta.env.VITE_BASENAME || "/";
+
     return (
-        <Router>
+        <Router basename={basename}>
             <Routes>
                 <Route path="/" element={<Home />} />
 
