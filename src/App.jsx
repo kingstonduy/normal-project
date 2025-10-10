@@ -34,7 +34,6 @@ export default function App() {
         <Router basename={BASE_URL}>
             <Routes>
                 <Route path="/" element={<Home />} />
-
                 {exercises.map((exercise, i) => {
                     const Component = components[i]; // pick correct ExcN
 

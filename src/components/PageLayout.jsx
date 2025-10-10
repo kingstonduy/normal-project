@@ -13,13 +13,13 @@ export default function PageLayout({ title, description, url, children }) {
 
 function Nav() {
     return (
-        <div className="w-full bg-gray-50 text-black rounded-2xl  mb-8">
-            <a
-                href="/"
-                className="bg-blue-600  !text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+        <div className="w-full bg-gray-50 text-black rounded-2xl mb-8">
+            <Link
+                to="/"
+                className="bg-blue-600 !text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
             >
                 HOME
-            </a>
+            </Link>
         </div>
     );
 }
